@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://8v7brm8x0bw6"]
+[gd_scene load_steps=6 format=3 uid="uid://8v7brm8x0bw6"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_tj0pu"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_ftxqd"]
+[ext_resource type="ArrayMesh" uid="uid://tqwsn68lan7s" path="res://Models/Cat.obj" id="2_ht4tf"]
+[ext_resource type="PackedScene" uid="uid://bgow01202vcqq" path="res://Pause Menu.tscn" id="3_a8l80"]
+[ext_resource type="PackedScene" uid="uid://c6hqpb740woor" path="res://Settings Menu.tscn" id="4_jy4bg"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_28n0u"]
 
@@ -10,7 +11,7 @@
 script = ExtResource("1_tj0pu")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_ftxqd")
+mesh = ExtResource("2_ht4tf")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_28n0u")
@@ -23,3 +24,8 @@ transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 
 
 [node name="Camera3D" type="Camera3D" parent="TwistPivot/PitchPivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="Pause Menu" parent="TwistPivot/PitchPivot/Camera3D" instance=ExtResource("3_a8l80")]
+
+[node name="Settings Menu" parent="TwistPivot/PitchPivot/Camera3D" instance=ExtResource("4_jy4bg")]
+metadata/_edit_use_anchors_ = true
