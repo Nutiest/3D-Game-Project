@@ -1,7 +1,8 @@
 extends CharacterBody3D
 
-@onready var pause_menu := $"TwistPivot/PitchPivot/Camera3D/Pause Menu"
-@onready var settings_menu := $"TwistPivot/PitchPivot/Camera3D/Settings Menu"
+@onready var pause_menu := $"TwistPivot/PitchPivot/SpringArm3D/Camera3D/Pause Menu"
+@onready var settings_menu := $"TwistPivot/PitchPivot/SpringArm3D/Camera3D/Settings Menu"
+@onready var spring_arm := $"TwistPivot/PitchPivot/SpringArm3D"
 @export var paused := false
 
 var SPEED = 10.0
@@ -48,6 +49,8 @@ func _physics_process(delta) -> void:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 	
+	#$MeshInstance3D.look_at(direction)
+	
 	if Input.is_action_just_pressed("Pause"):
 		open_close_pause_menu()
 	
@@ -62,6 +65,13 @@ func mouse_movement() -> void:
 	
 	twist_input = 0.0
 	pitch_input = 0.0
+	
+	if Input.is_action_just_pressed("Zoom In"):
+		spring_arm.spring_length = spring_arm.spring_length-0.5
+	elif Input.is_action_just_pressed("Zoom Out"):
+		spring_arm.spring_length = spring_arm.spring_length+0.5
+	
+	spring_arm.spring_length = clamp(spring_arm.spring_length, 1.5, 15.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -73,7 +83,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func open_close_pause_menu() -> void:
 	if !paused:
 		pause_menu.show()
-		emit_signal("paused", paused)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		Engine.time_scale = 0
 		paused = !paused
