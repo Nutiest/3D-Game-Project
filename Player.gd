@@ -5,11 +5,14 @@ extends CharacterBody3D
 @onready var twist_pivot := $TwistPivot
 @onready var pitch_pivot := $TwistPivot/PitchPivot
 @onready var spring_arm := $TwistPivot/PitchPivot/SpringArm3D
+@onready var animation := $AnimationTree
+@onready var mesh := $Node3D/MeshInstance3D
 @export var paused := false
 
 var SPEED := 10.0
 const JUMP_VELOCITY := 8
 var sprint := false
+var jumping := false
 
 var mouse_sensitivity := 0.002
 var twist_input := 0.0
@@ -37,16 +40,20 @@ func _physics_process(delta) -> void:
 		velocity.y -= gravity * delta * 2
 
 	# Handle jump.
-	if Input.is_action_pressed("Jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
-		SPEED = SPEED*1.2
+	jumping = false
+	
+	if Input.is_action_pressed("Jump"):
+		jumping = true
+		if is_on_floor():
+			velocity.y = JUMP_VELOCITY
+			SPEED = SPEED*1.2
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Backward")
 	var direction = (twist_pivot.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
-		$MeshInstance3D.look_at(position + Vector3(direction.x,0,direction.z))
+		$Node3D.look_at(position + Vector3(direction.x,0,direction.z))
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
 		
@@ -62,6 +69,10 @@ func _physics_process(delta) -> void:
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 	
 	
+	animation.set("parameters/conditions/idle", (!direction and is_on_floor()))
+	animation.set("parameters/conditions/walk", (direction and !sprint and is_on_floor()))
+	animation.set("parameters/conditions/run", (sprint and is_on_floor()))
+	animation.set("parameters/conditions/jump", jumping)
 	
 	if Input.is_action_just_pressed("Pause"):
 		open_close_pause_menu()
@@ -104,3 +115,6 @@ func open_close_pause_menu() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		Engine.time_scale = 1
 		paused = !paused
+
+func wait(seconds: float) -> void:
+	await get_tree().create_timer(seconds).timeout
